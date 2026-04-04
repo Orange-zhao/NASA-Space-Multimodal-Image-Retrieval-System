@@ -1,5 +1,4 @@
 # docker-compose.yml
-# 放在 multimodal-retrieval/ 根目录下
 
 services:
 
