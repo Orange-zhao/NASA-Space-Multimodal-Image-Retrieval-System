@@ -1,0 +1,76 @@
+# docker-compose.yml
+# 放在 multimodal-retrieval/ 根目录下
+
+services:
+
+  # ============================================================
+  # 服务一：ChromaDB（向量数据库）
+  # 最先启动，因为 backend 依赖它
+  # ============================================================
+  chromadb:
+    image: chromadb/chroma:latest    # 直接用官方镜像，不需要自己写 Dockerfile
+    container_name: chromadb_service
+    ports:
+      - "8000:8000"                  # 把容器的 8000 端口映射到本机的 8000 端口
+    volumes:
+    - ./storage/chroma_db:/chroma/chroma   # 数据持久化：容器里的数据存到本机
+    networks:
+      - nasa_network
+
+  # ============================================================
+  # 服务二：Ollama（运行 Llama3 的 LLM 服务）
+  # ============================================================
+  ollama:
+    image: ollama/ollama:latest      # 官方镜像
+    container_name: ollama_service
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./storage/ollama_models:/root/.ollama   # 模型文件持久化
+    networks:
+      - nasa_network
+
+  # ============================================================
+  # 服务三：Backend（FastAPI）
+  # 依赖 chromadb 和 ollama，所以要等它们启动后再启动
+  # ============================================================
+  backend:
+    build: ./backend                 # 用 backend/Dockerfile 来构建
+    container_name: app_backend
+    ports:
+      - "8001:8001"
+    environment:                     # 传入环境变量（代码里用 os.getenv 读取）
+      - CHROMA_HOST=chromadb         # 注意：容器间通信用服务名，不是 localhost
+      - CHROMA_PORT=8000
+      - OLLAMA_URL=http://ollama:11434/v1
+    volumes:
+      - ./storage/model_weights/huggingface:/root/.cache/huggingface  # 模型缓存
+      - ./storage/model_weights/torch:/root/.cache/torch
+    depends_on:
+      - chromadb                     # 告诉 Docker：先启动 chromadb，再启动我
+      - ollama
+    networks:
+      - nasa_network
+
+  # ============================================================
+  # 服务四：Frontend（Streamlit）
+  # 依赖 backend
+  # ============================================================
+  frontend:
+    build: ./frontend                # 用 frontend/Dockerfile 来构建
+    container_name: app_frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://backend:8001   # 容器间通信用服务名 backend
+    depends_on:
+      - backend
+    networks:
+      - nasa_network
+
+# ============================================================
+# 网络配置：让四个服务可以互相通信
+# ============================================================
+networks:
+  nasa_network:
+    external: true    # 用我们之前手动创建的网络
