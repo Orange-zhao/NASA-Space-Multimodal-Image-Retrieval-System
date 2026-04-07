@@ -49,24 +49,24 @@ ChromaDB            Ollama / Llama 3
 | Containerization | Docker Compose |
 
 ## Project Structure
-multimodal-retrieval/
-├── backend/
-│   ├── main.py          # FastAPI app: search & RAG endpoints
-│   ├── requirements.txt
-│   └── Dockerfile
-├── frontend/
-│   ├── app.py           # Streamlit UI
-│   ├── requirements.txt
-│   └── Dockerfile
-├── notebook/
-│   ├── 00_data_scrpy.ipynb        # NASA data collection
-│   ├── 01_Embedding_Indexing.ipynb # Embedding generation & indexing
-│   └── data/
-├── storage/
-│   ├── chroma_db/        # ChromaDB persistent storage
-│   ├── ollama_models/    # Llama 3 model weights
-│   └── model_weights/    # HuggingFace & PyTorch cache
-└── docker-compose.yml
+multimodal-retrieval/<br>
+├── backend/<br>
+│   ├── main.py        # FastAPI app: search & RAG endpoints<br>
+│   ├── requirements.txt<br>
+│   └── Dockerfile<br>
+├── frontend/<br>
+│   ├── app.py          # Streamlit UI<br>
+│   ├── requirements.txt<br>
+│   └── Dockerfile<br>
+├── notebook/<br>
+│   ├── 00_data_scrpy.ipynb       # NASA data collection<br>
+│   ├── 01_Embedding_Indexing.ipynb # Embedding generation & indexing<br>
+│   └── data/<br>
+├── storage/<br>
+│   ├── chroma_db/        # ChromaDB persistent storage<br>
+│   ├── ollama_models/    # Llama 3 model weights<br>
+│   └── model_weights/    # HuggingFace & PyTorch cache<br>
+└── docker-compose.yml<br>
 
 ## Quick Start
 
